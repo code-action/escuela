@@ -16,4 +16,10 @@ class Grado extends Model
         return $this->hasMany(Alumno::class,'alm_id_grd','grd_id');
     }
 
+    public static function materias($grado)
+    {
+        return Mxg::where('mxg_id_grd',$grado)->get();
+        
+    }
+
 }

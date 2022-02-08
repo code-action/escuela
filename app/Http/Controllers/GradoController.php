@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Grado;
+use App\Models\Materia;
+use App\Models\Mxg;
 use App\Http\Requests\GradoRequest;
 use DB;
 
@@ -27,7 +29,8 @@ class GradoController extends Controller
      */
     public function create()
     {
-        return view('grados.create');
+        $materias= Materia::orderBy('mat_nombre')->get();
+        return view('grados.create',compact('materias'));
     }
 
     /**
@@ -42,6 +45,16 @@ class GradoController extends Controller
             $grado = new grado();
             $grado->grd_nombre = $request->grd_nombre;
             $grado->save();
+            $materias= Materia::orderBy('mat_nombre')->get();
+            foreach($materias as $materia){
+                if($request["mat".$materia->mat_id]=='1'){
+                    $mxg =new Mxg();
+                    $mxg->mxg_id_grd=$grado->grd_id;
+                    $mxg->mxg_id_mat=$materia->mat_id;
+                    $mxg->save();
+                }
+
+            }
             return redirect()->route('grados.index')->withSuccess(__('Grado creado correctamente.'));
         } catch(\Exception $e){
             return redirect()->route('grados.index')->withError(__('Lo sentimos ocurrió un error'));
@@ -69,7 +82,8 @@ class GradoController extends Controller
     public function edit($id)
     {
         $grado= Grado::find($id);
-        return view('grados.edit',compact('grado'));
+        $materias= Materia::orderBy('mat_nombre')->get();
+        return view('grados.edit',compact('grado','materias'));
     }
 
     /**
@@ -85,6 +99,23 @@ class GradoController extends Controller
         try{
             $grado->grd_nombre = $request->grd_nombre;
             $grado->save();
+
+            $materias= Materia::orderBy('mat_nombre')->get();
+            foreach($materias as $materia){
+                if($request["mat".$materia->mat_id]=='1'){
+                    if(Mxg::where('mxg_id_mat',$materia->mat_id)->where('mxg_id_grd',$grado->grd_id)->count()==0){
+                        $mxg =new Mxg();
+                        $mxg->mxg_id_grd=$grado->grd_id;
+                        $mxg->mxg_id_mat=$materia->mat_id;
+                        $mxg->save();
+                    }
+                }else{
+                    if(Mxg::where('mxg_id_mat',$materia->mat_id)->where('mxg_id_grd',$grado->grd_id)->count()==1){
+                        Mxg::where('mxg_id_mat',$materia->mat_id)->where('mxg_id_grd',$grado->grd_id)->delete();
+                    }
+                }
+
+            }
             return redirect()->route('grados.index')->withSuccess(__('Grado editado correctamente.'));
         } catch(\Exception $e){
             return redirect()->route('grados.index')->withError(__('Lo sentimos ocurrió un error'));

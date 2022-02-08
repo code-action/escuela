@@ -25,8 +25,31 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <label class="col-sm-10 col-form-label">{{ __('Hacer click sobre las materias que desea agregar *') }}</label>
+                                
+                                @foreach($materias as $materia)
+                                    <div class="col-sm-6">
+
+                                        <div class="alert {{$materia->comprobar($grado->grd_id,$materia->mat_id)}}" id="div{{$materia->mat_id}}" onclick="changeSelected('{{$materia->mat_id}}')">
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            </button>
+                                            <span>
+                                            <b>{{$materia->mat_nombre}}</b>
+                                            @if($materia->comprobar($grado->grd_id,$materia->mat_id)=="alert-info")
+                                            <input type="hidden" name="mat{{$materia->mat_id}}" value="0">
+                                            @else
+                                            <input type="hidden" name="mat{{$materia->mat_id}}" value="1">
+                                            @endif
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                @endforeach
+                            </div>
                             <input type="hidden" name="id_validate" value="{{$grado->grd_id}}">
                             </div>
+
                         <div class="card-footer ">
                             <a href="{{ route('grados.index') }}"><button type="button" class="btn btn-fill btn-default">Cancelar</button></a>
                             <button type="submit" class="btn btn-fill btn-info">Guardar</button>
@@ -39,3 +62,20 @@
 </div>
 
 @endsection
+
+                    
+@push('js')
+<script>
+    function changeSelected(mat_id){
+        if($("#div"+mat_id).hasClass('alert-info')){
+            $("#div"+mat_id).removeClass('alert-info')
+            $("#div"+mat_id).addClass('alert-success')
+            $("#div"+mat_id).find("input").val('1')
+        }else{
+            $("#div"+mat_id).removeClass('alert-success')
+            $("#div"+mat_id).addClass('alert-info') 
+            $("#div"+mat_id).find("input").val('0')
+        }
+    }
+</script>
+@endpush

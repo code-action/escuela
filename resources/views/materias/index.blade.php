@@ -53,6 +53,7 @@
                               <i class="material-icons">assignment</i>
                               <div class="ripple-container"></div>
                             </a>
+                            @if($materia->validar($materia->mat_id)<1)
                             <button type="button" rel="tooltip" class="btn btn-danger btn-link" href="#" title="Eliminar" onclick="
                             return swal({
                               title: '¿Eliminar materia?',
@@ -71,6 +72,12 @@
                             });">
                             <i class="material-icons">close</i>
                             </button>
+                            @else
+                            <a rel="tooltip" class="btn btn-danger btn-link" href="#" data-original-title="" title="No se puede eliminar">
+                              <i class="material-icons">block</i>
+                              <div class="ripple-container"></div>
+                            </a>
+                            @endif
                           </form>
                         </td>
                         </tr>
